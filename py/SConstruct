@@ -1,0 +1,54 @@
+#
+# SConstruct
+# MVQ python extension
+#
+
+import sys
+import os
+
+mingw = int(ARGUMENTS.get('mingw', 0))
+
+if sys.platform == 'win32':
+
+    if mingw:
+        env = Environment(tools=['mingw'])
+        env.Replace(CXXFLAGS=['-DBOOST_PYTHON_DYNAMIC_LIB', '-O2'])
+        env.Append(CXXFLAGS=['-ftemplate-depth-100'])
+    else:
+        # ms vs.net
+        env = Environment()
+        env.Replace(CXXFLAGS='/D_WIN32 /DWIN32 /DBOOST_PYTHON_DYNAMIC_LIB /EHsc /O2 /G7')
+
+    env.Replace(
+        CPPPATH=['..', 'E:/Prog/Python/include', 'E:/Prog/boost_1_32_0'],
+        LIBPATH=['..', 'E:/Prog/Python/libs', 'E:/Prog/boost_1_32_0/lib', 'E:/Prog/boost_1_32_0/stage/lib'],
+        SHLIBPREFIX='',
+        ENV={'PATH': os.environ['PATH'], 'INCLUDE': os.environ['INCLUDE'], 'LIB': os.environ['LIB']}
+    )
+
+else:
+
+    pyver = '%d.%d' % (sys.version_info[0], sys.version_info[1])
+
+    env = Environment(
+        CPPPATH=['..', '/usr/include/python%s' % pyver],
+        # XXX why oh why does -fvisibility=hidden hide the module *initialization* function?
+        #CXXFLAGS='-ftemplate-depth-100 -fvisibility=hidden', #-DBOOST_PYTHON_DYNAMIC_LIB',
+        #LIBPATH=['..'],
+        SHLIBPREFIX='',
+    )
+
+Default('.')
+
+sources = ['py_mvq.cpp', 'py_vec2.cpp', 'py_vec3.cpp', 'py_vec4.cpp', 'py_mat4.cpp', 'py_bounds.cpp']
+
+if sys.platform == 'win32':
+    env['SHLIBSUFFIX'] = '.pyd'
+
+    if mingw:
+        env.SharedLibrary(target='mvq', source=sources, LIBS=['boost_python-mgw-mt', 'python24'])
+    else:
+        env.SharedLibrary(target='mvq', source=sources, LIBS=['boost_python-vc71-mt'])
+else:
+    env.SharedLibrary(target='mvq', source=sources,	LIBS=['boost_python'])
+
