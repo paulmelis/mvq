@@ -44,12 +44,12 @@ public:
 
     vec3f   operator/(float f) const
     {
-        register float inv_f = 1.0 / f;
+        float inv_f = 1.0 / f;
         return vec3f(_v[0]*inv_f, _v[1]*inv_f, _v[2]*inv_f);
     }
     void    operator/=(float f)
     {
-        register float inv_f = 1.0 / f;
+        float inv_f = 1.0 / f;
         _v[0] *= inv_f;
         _v[1] *= inv_f;
         _v[2] *= inv_f;
@@ -153,12 +153,12 @@ public:
 
     vec3d   operator/(double f) const
     {
-        register double inv_f = 1.0 / f;
+        double inv_f = 1.0 / f;
         return vec3d(_v[0]*inv_f, _v[1]*inv_f, _v[2]*inv_f);
     }
     void    operator/=(double f)
     {
-        register double inv_f = 1.0 / f;
+        double inv_f = 1.0 / f;
         _v[0] *= inv_f;
         _v[1] *= inv_f;
         _v[2] *= inv_f;
