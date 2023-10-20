@@ -47,12 +47,12 @@ public:
 
     vec2f   operator/(float f) const
     {
-        register float inv_f = 1.0 / f;
+        float inv_f = 1.0 / f;
         return vec2f(_v[0]*inv_f, _v[1]*inv_f);
     }
     void    operator/=(float f)
     {
-        register float inv_f = 1.0 / f;
+        float inv_f = 1.0 / f;
         _v[0] *= inv_f;
         _v[1] *= inv_f;
     }
@@ -135,12 +135,12 @@ public:
 
     vec2d   operator/(double f) const
     {
-        register double inv_f = 1.0 / f;
+        double inv_f = 1.0 / f;
         return vec2d(_v[0]*inv_f, _v[1]*inv_f);
     }
     void    operator/=(double f)
     {
-        register double inv_f = 1.0 / f;
+        double inv_f = 1.0 / f;
         _v[0] *= inv_f;
         _v[1] *= inv_f;
     }
