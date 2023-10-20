@@ -14,7 +14,20 @@ public:
 
     // Create a quaternion that represents a rotation of
     // angle degrees around the given axis.
-    static quatf rotation(vec3 axis, float angle);
+    static quatf rotation(vec3 axis, float angle)
+    {
+        axis = axis.normalized();
+
+        const float half_angle_rad = deg2rad(angle/2);
+        const float sin_a = sin(half_angle_rad);
+
+        return quatf(
+            cos(half_angle_rad),
+            axis.x() * sin_a,
+            axis.y() * sin_a,
+            axis.z() * sin_a
+        ).normalized();
+    }
 
     // Create a quaternion representation of point p
     static quatf point(vec3 p);
@@ -23,6 +36,7 @@ public:
 
     quatf()                                     { _v[0] = _v[1] = _v[2] = _v[3] = 0.0f; }
     quatf(const quatf& q)                       { _v[0] = q.w(); _v[1] = q.x(); _v[2] = q.y(); _v[3] = q.z(); }
+    quatf(vec3f p)                              { _v[0] = 0.0f;  _v[1] = p.x();  _v[2] = p.y();  _v[3] = p.z(); }
     quatf(float ww, float xx, float yy, float zz) { _v[0] = ww;  _v[1] = xx;  _v[2] = yy;  _v[3] = zz; }
     quatf(const float q[4])                     { _v[0] = q[0];  _v[1] = q[1];  _v[2] = q[2];  _v[3] = q[3]; }
 
@@ -90,20 +104,12 @@ public:
     // Calculate the inverse of a quaterion
     quatf   inverse() const
     {
-        float   invlen = 1.0f / length();
-        quatf   res = conjugate();
-
-        // XXX?
-        invlen = invlen * invlen;
-
-        res *= invlen;
-
-        return res;
+        return conjugate() / length2();
     }
 
 
-    // Transform
-    //vec3    quat_transform_vector(quat q, vec3 v);
+    // Transform a point (assumes quat represents a rotation, i.e. normalized)
+    vec3f   transform(vec3 p) const;
 
     mat4d   to_rotation_matrix() const 
     {
@@ -134,31 +140,15 @@ public:
     float   y() const                           { return _v[2]; }
     float   z() const                           { return _v[3]; }
 
-    void print() const                          { printf("<%.6f; %.6f %.6f %.6f>", _v[0], _v[1], _v[2], _v[3]); }
+    void    print() const                       { printf("<%.6f; %.6f %.6f %.6f>", _v[0], _v[1], _v[2], _v[3]); }
 
 protected:
     float _v[4];        // w, x, y, z
 };
 
-/*
-// Scalar scaling
-
-inline vec3f
-operator*(float f, const vec3f& v)
-{
-    return vec3f(f*v.x(), f*v.y(), f*v.z());
-}
-
-inline vec3f
-operator*(double d, const vec3f& v)
-{
-    return vec3f(d*v.x(), d*v.y(), d*v.z());
-}
-*/
-
 // XXX not checked
 inline quatf
-operator*(quatf q, quatf r)
+operator*(const quatf& q, const quatf& r)
 {
     return quatf(
         q.w()*r.w() - q.x()*r.x() - q.y()*r.y() - q.z()*r.z(),
@@ -166,6 +156,13 @@ operator*(quatf q, quatf r)
         q.w()*r.y() + q.y()*r.w() + q.z()*r.x() - q.x()*r.z(),
         q.w()*r.z() + q.z()*r.w() + q.x()*r.y() - q.y()*r.x()
     );
+}
+
+inline vec3f
+quatf::transform(vec3 p) const
+{
+    quatf r = *this * quatf(p) * conjugate();
+    return vec3f(r.x(), r.y(), r.z());
 }
 
 //
