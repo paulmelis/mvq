@@ -12,11 +12,18 @@ class quatf
 {
 public:
 
+    static quatf unit()
+    {
+        return quatf(1.0f, 0.0f, 0.0f, 0.0f);
+    }
+
     // Create a quaternion that represents a rotation of
     // angle degrees around the given axis.
     static quatf rotation(vec3 axis, float angle)
     {
-        axis = axis.normalized();
+        const float l2 = axis.length2();
+        if (l2 > 1e-6)
+            axis = axis / (l2*l2);
 
         const float half_angle_rad = deg2rad(angle/2);
         const float sin_a = sin(half_angle_rad);
@@ -30,6 +37,7 @@ public:
     }
 
     // Create a quaternion representation of point p
+    // XXX implementation missing?
     static quatf point(vec3 p);
 
 public:
