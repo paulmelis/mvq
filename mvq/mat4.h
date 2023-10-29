@@ -9,6 +9,10 @@
 
 namespace mvq {
 
+//
+// Note: assumes pre-multiplication order, i.e. v*M!
+//
+
 class mat4d
 {
 public:
@@ -143,19 +147,32 @@ protected:
 inline mat4d
 mat4d::identity()
 {
-    return mat4d(1.0,0.0,0.0,0.0, 0.0,1.0,0.0,0.0, 0.0,0.0,1.0,0.0, 0.0,0.0,0.0,1.0);
+    return mat4d(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
 }
 
 inline mat4d
 mat4d::diagonal(double e00, double e11, double e22, double e33)
 {
-    return mat4d(e00,0.0,0.0,0.0, 0.0,e11,0.0,0.0, 0.0,0.0,e22,0.0, 0.0,0.0,0.0,e33);
+    return mat4d(
+        e00, 0.0, 0.0, 0.0,
+        0.0, e11, 0.0, 0.0,
+        0.0, 0.0, e22, 0.0,
+        0.0, 0.0, 0.0, e33);
 }
 
 inline mat4d
 mat4d::translate(double x, double y, double z)
 {
-    return mat4d(1.0,0.0,0.0,0.0, 0.0,1.0,0.0,0.0, 0.0,0.0,1.0,0.0, x,y,z,1.0);
+    return mat4d(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        x,   y,   z,   1.0);
 }
 
 /*
@@ -169,7 +186,11 @@ mat4d::translation(vec3d v)
 inline mat4d
 mat4d::scale(double x, double y, double z)
 {
-    return mat4d(x,0.0,0.0,0.0, 0.0,y,0.0,0.0, 0.0,0.0,z,0.0, 0.0,0.0,0.0,1.0);
+    return mat4d(
+        x,   0.0, 0.0, 0.0,
+        0.0, y,   0.0, 0.0,
+        0.0, 0.0, z,   0.0,
+        0.0, 0.0, 0.0, 1.0);
 }
 
 /*
@@ -235,11 +256,14 @@ mat4d::look_at(vec3d eye, vec3d center, vec3d up)
     vec3d u(s^f);
     u.normalize();
 
-    return mat4d::translate(-eye.x(), -eye.y(), -eye.z()) * mat4d(
-        s[0],     u[0],     -f[0],     0.0,
-        s[1],     u[1],     -f[1],     0.0,
-        s[2],     u[2],     -f[2],     0.0,
-        0.0,     0.0,     0.0,         1.0);
+    return mat4d::translate(-eye.x(), -eye.y(), -eye.z())
+        *
+        mat4d(
+            s[0],   u[0],   -f[0],  0.0,
+            s[1],   u[1],   -f[1],  0.0,
+            s[2],   u[2],   -f[2],  0.0,
+            0.0,    0.0,    0.0,    1.0
+        );
 }
 
 // XXX untested as of yet!
@@ -683,8 +707,8 @@ mat4d::is_zero() const
     return true;
 }
 
-// transform point (assumes p.w == 1)
-
+// transform homogenous point (i.e. assumes p.w == 1) AND normalizes!
+// PRE-MULTIPLIES VECTOR WITH MATRIX, i.e. v*M!
 inline vec3f
 mat4d::transform(float x, float y, float z) const
 {

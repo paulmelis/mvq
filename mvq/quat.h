@@ -122,7 +122,7 @@ public:
     mat4d   to_rotation_matrix() const 
     {
         quatf qn = normalized();
-        float rr  = qn.w();
+        float rr = qn.w();
         float rx = qn.x();
         float ry = qn.y();
         float rz = qn.z();
