@@ -25,7 +25,9 @@ public:
     inline static mat4d diagonal(double e00, double e11, double e22, double e33);
 
     inline static mat4d translate(double x, double y, double z);
+    inline static mat4d translate(vec3 t);
     inline static mat4d scale(double x, double y, double z);
+    inline static mat4d scale(vec3 s);
 
     inline static mat4d rotate_x(double angle);
     inline static mat4d	rotate_y(double angle);
@@ -175,6 +177,16 @@ mat4d::translate(double x, double y, double z)
         x,   y,   z,   1.0);
 }
 
+inline mat4d
+mat4d::translate(vec3 t)
+{
+    return mat4d(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        t.x(), t.y(), t.z(), 1.0);
+}
+
 /*
 inline mat4d
 mat4d::translation(vec3d v)
@@ -191,6 +203,16 @@ mat4d::scale(double x, double y, double z)
         0.0, y,   0.0, 0.0,
         0.0, 0.0, z,   0.0,
         0.0, 0.0, 0.0, 1.0);
+}
+
+inline mat4d
+mat4d::scale(vec3 s)
+{
+    return mat4d(
+        s.x(),  0.0,    0.0,    0.0,
+        0.0,    s.y(),  0.0,    0.0,
+        0.0,    0.0,    s.z(),  0.0,
+        0.0,    0.0,    0.0,    1.0); 
 }
 
 /*
